@@ -8,6 +8,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -142,16 +143,57 @@ export default function Index() {
   if (mode === null) {
     return (
       <SafeAreaView style={styles.safeArea}>
+        <GameBackdrop />
         <ScrollView contentContainerStyle={styles.homeContent}>
           <BrandHeader />
           <View style={styles.intro}>
-            <Text style={styles.eyebrow}>YOUR DAILY DOSE OF DISCOVERY</Text>
-            <Text style={styles.title}>How well do you know the world?</Text>
+            <Text style={styles.eyebrow}>A WORLD OF FLAGS AWAITS</Text>
+            <Text style={styles.title}>
+              Know the world.{"\n"}
+              <Text style={styles.titleAccent}>Play the quiz.</Text>
+            </Text>
             <Text style={styles.subtitle}>
-              Take a quick trip around the globe, one flag at a time.
+              Read the flag. Trust your instincts. See how far you can travel.
             </Text>
           </View>
-          <Text style={styles.sectionTitle}>Choose your challenge</Text>
+          <View style={styles.heroCard}>
+            <LinearGradient
+              colors={["#123E91", "#0A2056", "#07143A"]}
+              end={{ x: 1, y: 1 }}
+              start={{ x: 0, y: 0 }}
+              style={StyleSheet.absoluteFill}
+            />
+            <View style={styles.heroTopline}>
+              <Text style={styles.heroEyebrow}>YOUR NEXT DESTINATION</Text>
+              <Text style={styles.heroPlane}>✈</Text>
+            </View>
+            <View style={styles.globeStage}>
+              <View style={styles.globeOrbit} />
+              <Text style={styles.heroGlobe}>🌍</Text>
+              <View style={[styles.flagChip, styles.flagChipOne]}>
+                <Text style={styles.flagChipText}>🇬🇧</Text>
+              </View>
+              <View style={[styles.flagChip, styles.flagChipTwo]}>
+                <Text style={styles.flagChipText}>🇯🇵</Text>
+              </View>
+              <Text style={[styles.heroSpark, styles.heroSparkOne]}>✦</Text>
+              <Text style={[styles.heroSpark, styles.heroSparkTwo]}>✧</Text>
+            </View>
+            <View style={styles.heroBottomline}>
+              <View>
+                <Text style={styles.heroTitle}>THE WORLD IS YOURS</Text>
+                <Text style={styles.heroCaption}>
+                  {countryLoad.status === "ready"
+                    ? `${countryLoad.countries.length} flags · 10 questions`
+                    : "10 flags · One great adventure"}
+                </Text>
+              </View>
+              <View style={styles.heroArrow}>
+                <Text style={styles.heroArrowText}>↗</Text>
+              </View>
+            </View>
+          </View>
+          <Text style={styles.sectionTitle}>Choose your level</Text>
           {countryLoad.status === "loading" && (
             <Text style={styles.loadMessage}>Loading country flags...</Text>
           )}
@@ -178,6 +220,12 @@ export default function Index() {
                 onPress={() => startQuiz("easy")}
                 style={[styles.modeCard, styles.easyCard]}
               >
+                <LinearGradient
+                  colors={["#1255A8", "#0B3476", "#0A2559"]}
+                  end={{ x: 1, y: 1 }}
+                  start={{ x: 0, y: 0 }}
+                  style={StyleSheet.absoluteFill}
+                />
                 <View style={[styles.modeIcon, styles.easyIcon]}>
                   <Text style={styles.modeEmoji}>🧭</Text>
                 </View>
@@ -189,7 +237,7 @@ export default function Index() {
                     </Text>
                   </View>
                   <Text style={styles.modeDescription}>
-                    Spot the flag and pick the right country from four choices.
+                    Spot the flag. Pick the right country from four choices.
                   </Text>
                 </View>
                 <Text style={styles.chevron}>›</Text>
@@ -199,6 +247,12 @@ export default function Index() {
                 onPress={() => startQuiz("hard")}
                 style={[styles.modeCard, styles.hardCard]}
               >
+                <LinearGradient
+                  colors={["#253B82", "#152858", "#101D45"]}
+                  end={{ x: 1, y: 1 }}
+                  start={{ x: 0, y: 0 }}
+                  style={StyleSheet.absoluteFill}
+                />
                 <View style={[styles.modeIcon, styles.hardIcon]}>
                   <Text style={styles.modeEmoji}>✍️</Text>
                 </View>
@@ -210,7 +264,7 @@ export default function Index() {
                     </Text>
                   </View>
                   <Text style={styles.modeDescription}>
-                    No hints this time. Type the country name from memory.
+                    No options this time. Name the country from its flag.
                   </Text>
                 </View>
                 <Text style={styles.chevron}>›</Text>
@@ -219,7 +273,7 @@ export default function Index() {
           )}
           <View style={styles.homeFooter}>
             <Text style={styles.footerEmoji}>🌍</Text>
-            <Text style={styles.footerText}>10 flags. One great adventure.</Text>
+            <Text style={styles.footerText}>Know the world. Play the quiz.</Text>
           </View>
           <View style={styles.attribution}>
             <Text style={styles.attributionText}>
@@ -249,14 +303,22 @@ export default function Index() {
 
     return (
       <SafeAreaView style={styles.safeArea}>
+        <GameBackdrop />
         <ScrollView contentContainerStyle={styles.resultContent}>
           <BrandHeader onChangeMode={changeMode} />
           <View style={styles.resultCard}>
-            <Text style={styles.resultEmoji}>
-              {score >= 8 ? "🏆" : score >= 5 ? "🌟" : "🌱"}
-            </Text>
+            <LinearGradient
+              colors={["#10295F", "#0A1941", "#07112F"]}
+              end={{ x: 1, y: 1 }}
+              start={{ x: 0, y: 0 }}
+              style={StyleSheet.absoluteFill}
+            />
+            <Text style={styles.resultEmoji}>🏆</Text>
             <Text style={styles.resultEyebrow}>QUIZ COMPLETE</Text>
-            <Text style={styles.resultTitle}>{resultTitle}</Text>
+            <Text style={styles.resultTitle}>
+              {score === QUESTION_COUNT ? "Perfect round!" : "Level complete!"}
+            </Text>
+            <Text style={styles.resultRank}>{resultTitle}</Text>
             <Text style={styles.resultSubtitle}>
               {mode === "easy" ? "Easy mode" : "Hard mode"} · You made it around
               the world!
@@ -277,6 +339,12 @@ export default function Index() {
               onPress={() => startQuiz(mode)}
               style={styles.primaryButton}
             >
+              <LinearGradient
+                colors={["#FFE56D", "#FFC52E", "#F5A900"]}
+                end={{ x: 1, y: 1 }}
+                start={{ x: 0, y: 0 }}
+                style={StyleSheet.absoluteFill}
+              />
               <Text style={styles.primaryButtonText}>Play again</Text>
               <Text style={styles.primaryButtonArrow}>↗</Text>
             </Pressable>
@@ -297,6 +365,7 @@ export default function Index() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <GameBackdrop />
       <ScrollView
         contentContainerStyle={styles.quizContent}
         keyboardShouldPersistTaps="handled"
@@ -305,10 +374,10 @@ export default function Index() {
         <View style={styles.progressHeader}>
           <View>
             <Text style={styles.eyebrow}>
-              {mode === "easy" ? "EASY MODE" : "HARD MODE"}
+              {mode === "easy" ? "EASY MODE" : "HARD MODE"} · WORLD TOUR
             </Text>
             <Text style={styles.questionCount}>
-              QUESTION {String(questionIndex + 1).padStart(2, "0")}
+              LEVEL {questionIndex + 1}
               <Text style={styles.questionTotal}> / {QUESTION_COUNT}</Text>
             </Text>
           </View>
@@ -325,7 +394,13 @@ export default function Index() {
           <View style={[styles.progressFill, { width: `${progress}%` }]} />
         </View>
         <View style={styles.flagCard}>
-          <Text style={styles.flagLabel}>WHICH COUNTRY IS THIS?</Text>
+          <LinearGradient
+            colors={["#102A61", "#0A1B43", "#081432"]}
+            end={{ x: 1, y: 1 }}
+            start={{ x: 0, y: 0 }}
+            style={StyleSheet.absoluteFill}
+          />
+          <Text style={styles.flagLabel}>WHICH COUNTRY HAS THIS FLAG?</Text>
           {failedFlagCode === question.answer.code ? (
             <View style={styles.flagUnavailable}>
               <Text style={styles.flagUnavailableCode}>
@@ -348,8 +423,8 @@ export default function Index() {
           )}
           <Text style={styles.flagHint}>
             {mode === "easy"
-              ? "Choose the country this flag belongs to"
-              : "Think carefully and type your answer"}
+              ? "Choose the country below"
+              : "Type the country name from memory"}
           </Text>
         </View>
         {mode === "easy" ? (
@@ -410,6 +485,12 @@ export default function Index() {
                   !guess.trim() && styles.primaryButtonDisabled,
                 ]}
               >
+                <LinearGradient
+                  colors={["#FFE56D", "#FFC52E", "#F5A900"]}
+                  end={{ x: 1, y: 1 }}
+                  start={{ x: 0, y: 0 }}
+                  style={StyleSheet.absoluteFill}
+                />
                 <Text style={styles.primaryButtonText}>Check answer</Text>
                 <Text style={styles.primaryButtonArrow}>↗</Text>
               </Pressable>
@@ -427,6 +508,12 @@ export default function Index() {
             onPress={goToNextQuestion}
             style={[styles.primaryButton, styles.nextButton]}
           >
+            <LinearGradient
+              colors={["#FFE56D", "#FFC52E", "#F5A900"]}
+              end={{ x: 1, y: 1 }}
+              start={{ x: 0, y: 0 }}
+              style={StyleSheet.absoluteFill}
+            />
             <Text style={styles.primaryButtonText}>
               {questionIndex === QUESTION_COUNT - 1
                 ? "See my score"
@@ -444,9 +531,14 @@ function BrandHeader({ onChangeMode }: { onChangeMode?: () => void }) {
   return (
     <View style={styles.header}>
       <View style={styles.brand}>
-        <View style={styles.brandIcon}>
+        <LinearGradient
+          colors={["#35B5FF", "#2258D9", "#6F4DFF"]}
+          end={{ x: 1, y: 1 }}
+          start={{ x: 0, y: 0 }}
+          style={styles.brandIcon}
+        >
           <Text style={styles.brandEmoji}>🌍</Text>
-        </View>
+        </LinearGradient>
         <Text style={styles.brandName}>Flagora</Text>
       </View>
       {onChangeMode && (
@@ -470,8 +562,15 @@ function AnswerFeedback({
   country: Country;
 }) {
   return (
-    <View
+    <LinearGradient
       accessibilityLiveRegion="polite"
+      colors={
+        feedback.isCorrect
+          ? ["#0C3D3B", "#0A2D35"]
+          : ["#4A263B", "#311E39"]
+      }
+      end={{ x: 1, y: 1 }}
+      start={{ x: 0, y: 0 }}
       style={[
         styles.feedbackBox,
         feedback.isCorrect ? styles.feedbackCorrect : styles.feedbackWrong,
@@ -490,20 +589,43 @@ function AnswerFeedback({
             : `This flag belongs to ${country.country}.`}
         </Text>
       </View>
+    </LinearGradient>
+  );
+}
+
+function GameBackdrop() {
+  return (
+    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+      <LinearGradient
+        colors={["#03091F", "#07163D", "#06102E"]}
+        end={{ x: 1, y: 1 }}
+        start={{ x: 0, y: 0 }}
+        style={StyleSheet.absoluteFill}
+      />
+      <View style={[styles.orbitGlow, styles.orbitGlowTop]} />
+      <View style={[styles.orbitGlow, styles.orbitGlowBottom]} />
+      <View style={[styles.backgroundStar, styles.backgroundStarOne]} />
+      <View style={[styles.backgroundStar, styles.backgroundStarTwo]} />
+      <View style={[styles.backgroundStar, styles.backgroundStarThree]} />
     </View>
   );
 }
 
 const colors = {
-  background: "#F5F7F1",
-  ink: "#1C2D26",
-  muted: "#77827B",
-  green: "#247A59",
-  greenDark: "#1B6548",
-  greenPale: "#E8F3EC",
-  orangePale: "#FFF1E3",
-  orange: "#B56323",
-  white: "#FFFFFF",
+  background: "#03091F",
+  ink: "#F7F9FF",
+  muted: "#A8B6D8",
+  green: "#35D88B",
+  greenDark: "#16B96F",
+  greenPale: "rgba(53, 216, 139, 0.16)",
+  orangePale: "rgba(255, 207, 54, 0.14)",
+  orange: "#FFD34D",
+  white: "#F7F9FF",
+  blue: "#55C6FF",
+  blueDark: "#123C83",
+  gold: "#FFD447",
+  goldDeep: "#F5A900",
+  red: "#FF8994",
 };
 
 const styles = StyleSheet.create({
@@ -513,129 +635,264 @@ const styles = StyleSheet.create({
   },
   homeContent: {
     flexGrow: 1,
-    paddingHorizontal: 22,
-    paddingTop: 16,
-    paddingBottom: 28,
+    width: "100%",
+    maxWidth: 560,
+    alignSelf: "center",
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    paddingBottom: 30,
   },
   quizContent: {
     flexGrow: 1,
-    paddingHorizontal: 22,
-    paddingTop: 16,
+    width: "100%",
+    maxWidth: 560,
+    alignSelf: "center",
+    paddingHorizontal: 20,
+    paddingTop: 8,
     paddingBottom: 32,
   },
   resultContent: {
     flexGrow: 1,
-    paddingHorizontal: 22,
-    paddingTop: 16,
+    width: "100%",
+    maxWidth: 560,
+    alignSelf: "center",
+    paddingHorizontal: 20,
+    paddingTop: 8,
     paddingBottom: 32,
   },
   header: {
-    minHeight: 48,
+    minHeight: 50,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 26,
+    marginBottom: 18,
   },
   brand: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: 11,
   },
   brandIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 14,
+    width: 42,
+    height: 42,
+    borderRadius: 15,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: colors.greenPale,
+    borderWidth: 1,
+    borderColor: "rgba(120, 203, 255, 0.6)",
   },
   brandEmoji: {
-    fontSize: 21,
+    fontSize: 23,
   },
   brandName: {
     color: colors.ink,
-    fontSize: 20,
+    fontSize: 21,
     fontWeight: "800",
-    letterSpacing: -0.5,
+    letterSpacing: 0.2,
   },
   changeModeButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 14,
-    backgroundColor: colors.white,
+    paddingVertical: 9,
+    paddingHorizontal: 13,
+    borderWidth: 1,
+    borderColor: "rgba(117, 171, 255, 0.35)",
+    borderRadius: 13,
+    backgroundColor: "rgba(20, 45, 99, 0.72)",
   },
   changeModeText: {
-    color: colors.greenDark,
+    color: colors.gold,
     fontSize: 13,
     fontWeight: "700",
   },
   intro: {
-    marginTop: 16,
-    marginBottom: 30,
+    marginTop: 6,
+    marginBottom: 18,
   },
   eyebrow: {
-    color: colors.green,
-    fontSize: 11,
+    color: colors.gold,
+    fontSize: 10,
     fontWeight: "800",
-    letterSpacing: 1.5,
+    letterSpacing: 1.8,
   },
   title: {
-    maxWidth: 350,
-    marginTop: 12,
+    maxWidth: 430,
+    marginTop: 10,
     color: colors.ink,
-    fontSize: 34,
+    fontSize: 36,
     fontWeight: "800",
-    lineHeight: 39,
-    letterSpacing: -1,
+    lineHeight: 41,
+    letterSpacing: -0.8,
+  },
+  titleAccent: {
+    color: colors.gold,
   },
   subtitle: {
-    maxWidth: 330,
-    marginTop: 12,
+    maxWidth: 380,
+    marginTop: 9,
     color: colors.muted,
-    fontSize: 15,
-    lineHeight: 23,
+    fontSize: 14,
+    lineHeight: 21,
   },
-  sectionTitle: {
-    marginBottom: 12,
-    color: colors.ink,
-    fontSize: 16,
-    fontWeight: "800",
+  heroCard: {
+    position: "relative",
+    minHeight: 248,
+    overflow: "hidden",
+    padding: 18,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: "rgba(93, 179, 255, 0.45)",
+    borderRadius: 25,
+    backgroundColor: "#0A1D48",
   },
-  modeCard: {
+  heroTopline: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderRadius: 22,
+    justifyContent: "space-between",
   },
-  easyCard: {
-    backgroundColor: colors.white,
-    borderColor: "#E7EDE7",
+  heroEyebrow: {
+    color: "#BEDBFF",
+    fontSize: 9,
+    fontWeight: "800",
+    letterSpacing: 1.6,
   },
-  hardCard: {
-    backgroundColor: "#FFFCF8",
-    borderColor: "#F1E8DC",
+  heroPlane: {
+    color: colors.gold,
+    fontSize: 21,
+    transform: [{ rotate: "-12deg" }],
   },
-  modeIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
+  globeStage: {
+    height: 128,
     alignItems: "center",
     justifyContent: "center",
   },
+  globeOrbit: {
+    position: "absolute",
+    width: 170,
+    height: 58,
+    borderWidth: 1,
+    borderColor: "rgba(85, 198, 255, 0.82)",
+    borderRadius: 90,
+    transform: [{ rotate: "-18deg" }],
+  },
+  heroGlobe: {
+    fontSize: 82,
+    lineHeight: 100,
+    textShadowColor: "rgba(46, 159, 255, 0.6)",
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 18,
+  },
+  flagChip: {
+    position: "absolute",
+    width: 34,
+    height: 34,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "rgba(135, 192, 255, 0.65)",
+    borderRadius: 12,
+    backgroundColor: "#102A62",
+  },
+  flagChipOne: {
+    left: "18%",
+    top: 16,
+  },
+  flagChipTwo: {
+    right: "17%",
+    bottom: 13,
+  },
+  flagChipText: {
+    fontSize: 19,
+  },
+  heroSpark: {
+    position: "absolute",
+    color: colors.gold,
+    fontSize: 16,
+  },
+  heroSparkOne: {
+    left: "27%",
+    bottom: 15,
+  },
+  heroSparkTwo: {
+    right: "27%",
+    top: 12,
+    color: colors.blue,
+  },
+  heroBottomline: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  heroTitle: {
+    color: colors.ink,
+    fontSize: 12,
+    fontWeight: "800",
+    letterSpacing: 1.1,
+  },
+  heroCaption: {
+    marginTop: 5,
+    color: "#BED0F3",
+    fontSize: 11,
+    fontWeight: "600",
+  },
+  heroArrow: {
+    width: 37,
+    height: 37,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 13,
+    backgroundColor: colors.gold,
+  },
+  heroArrowText: {
+    color: "#071337",
+    fontSize: 21,
+    fontWeight: "800",
+  },
+  sectionTitle: {
+    marginBottom: 11,
+    color: colors.ink,
+    fontSize: 15,
+    fontWeight: "800",
+  },
+  modeCard: {
+    position: "relative",
+    minHeight: 91,
+    flexDirection: "row",
+    alignItems: "center",
+    overflow: "hidden",
+    padding: 14,
+    marginBottom: 11,
+    borderWidth: 1,
+    borderRadius: 19,
+  },
+  easyCard: {
+    borderColor: "rgba(85, 198, 255, 0.52)",
+    backgroundColor: "#0A2E69",
+  },
+  hardCard: {
+    borderColor: "rgba(147, 161, 255, 0.38)",
+    backgroundColor: "#151F4C",
+  },
+  modeIcon: {
+    width: 46,
+    height: 46,
+    borderRadius: 15,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+  },
   easyIcon: {
-    backgroundColor: colors.greenPale,
+    borderColor: "rgba(113, 204, 255, 0.52)",
+    backgroundColor: "rgba(61, 157, 255, 0.2)",
   },
   hardIcon: {
-    backgroundColor: colors.orangePale,
+    borderColor: "rgba(255, 214, 85, 0.5)",
+    backgroundColor: "rgba(255, 190, 41, 0.16)",
   },
   modeEmoji: {
     fontSize: 23,
   },
   modeCopy: {
     flex: 1,
-    marginHorizontal: 12,
+    marginHorizontal: 11,
   },
   modeTitleRow: {
     flexDirection: "row",
@@ -645,33 +902,33 @@ const styles = StyleSheet.create({
   },
   modeTitle: {
     color: colors.ink,
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "800",
   },
   levelBadge: {
     paddingHorizontal: 7,
-    paddingVertical: 4,
+    paddingVertical: 3,
     borderRadius: 8,
-    fontSize: 8,
+    fontSize: 7,
     fontWeight: "800",
     letterSpacing: 0.6,
   },
   easyBadge: {
-    color: colors.greenDark,
-    backgroundColor: colors.greenPale,
+    color: "#9DE0FF",
+    backgroundColor: "rgba(69, 169, 255, 0.2)",
   },
   hardBadge: {
-    color: colors.orange,
+    color: colors.gold,
     backgroundColor: colors.orangePale,
   },
   modeDescription: {
     marginTop: 6,
-    color: colors.muted,
+    color: "#C2D0EE",
     fontSize: 12,
     lineHeight: 17,
   },
   chevron: {
-    color: "#A0AAA3",
+    color: colors.gold,
     fontSize: 27,
     lineHeight: 30,
   },
@@ -687,7 +944,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
   },
   footerText: {
-    color: colors.muted,
+    color: "#B5C3E2",
     fontSize: 12,
     fontWeight: "600",
   },
@@ -700,9 +957,9 @@ const styles = StyleSheet.create({
   errorCard: {
     padding: 18,
     borderWidth: 1,
-    borderColor: "#E7D7D1",
+    borderColor: "rgba(255, 137, 148, 0.4)",
     borderRadius: 18,
-    backgroundColor: "#FFF7F4",
+    backgroundColor: "rgba(104, 34, 57, 0.35)",
   },
   errorTitle: {
     color: colors.ink,
@@ -721,7 +978,7 @@ const styles = StyleSheet.create({
     paddingVertical: 9,
     marginTop: 14,
     borderRadius: 12,
-    backgroundColor: colors.green,
+    backgroundColor: colors.blueDark,
   },
   retryButtonText: {
     color: colors.white,
@@ -731,32 +988,32 @@ const styles = StyleSheet.create({
   attribution: {
     alignItems: "center",
     gap: 4,
-    paddingTop: 16,
+    paddingTop: 17,
   },
   attributionText: {
-    color: colors.muted,
+    color: "#7185AF",
     fontSize: 10,
     textAlign: "center",
   },
   attributionLink: {
-    color: colors.greenDark,
+    color: colors.gold,
     textDecorationLine: "underline",
   },
   progressHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 14,
+    marginBottom: 13,
   },
   questionCount: {
     marginTop: 6,
     color: colors.ink,
-    fontSize: 19,
+    fontSize: 21,
     fontWeight: "800",
-    letterSpacing: -0.3,
+    letterSpacing: -0.4,
   },
   questionTotal: {
-    color: colors.muted,
+    color: "#8294BC",
     fontSize: 16,
     fontWeight: "600",
   },
@@ -768,11 +1025,13 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingHorizontal: 12,
     paddingVertical: 9,
-    borderRadius: 16,
-    backgroundColor: colors.white,
+    borderWidth: 1,
+    borderColor: "rgba(255, 210, 71, 0.32)",
+    borderRadius: 15,
+    backgroundColor: "rgba(30, 43, 91, 0.9)",
   },
   scoreStar: {
-    color: "#E7A936",
+    color: colors.gold,
     fontSize: 16,
   },
   scorePillText: {
@@ -783,46 +1042,48 @@ const styles = StyleSheet.create({
   progressTrack: {
     height: 7,
     overflow: "hidden",
-    marginBottom: 20,
+    marginBottom: 18,
     borderRadius: 6,
-    backgroundColor: "#E5EAE4",
+    backgroundColor: "rgba(118, 151, 212, 0.22)",
   },
   progressFill: {
     height: "100%",
     borderRadius: 6,
-    backgroundColor: colors.green,
+    backgroundColor: colors.gold,
   },
   flagCard: {
-    minHeight: 226,
+    position: "relative",
+    minHeight: 260,
     alignItems: "center",
     justifyContent: "center",
-    padding: 22,
-    marginBottom: 18,
+    overflow: "hidden",
+    padding: 20,
+    marginBottom: 17,
     borderWidth: 1,
-    borderColor: "#E9EDE8",
-    borderRadius: 26,
-    backgroundColor: colors.white,
+    borderColor: "rgba(92, 178, 255, 0.42)",
+    borderRadius: 24,
+    backgroundColor: "#0A1C45",
   },
   flagLabel: {
-    color: colors.muted,
+    color: "#AFCAFA",
     fontSize: 10,
     fontWeight: "800",
-    letterSpacing: 1.4,
+    letterSpacing: 1.5,
   },
   flagImage: {
-    width: 150,
-    height: 100,
-    marginTop: 18,
+    width: 190,
+    height: 130,
+    marginTop: 17,
   },
   flagUnavailable: {
     alignItems: "center",
     justifyContent: "center",
-    width: 150,
-    height: 100,
-    marginTop: 18,
+    width: 190,
+    height: 130,
+    marginTop: 17,
   },
   flagUnavailableCode: {
-    color: colors.ink,
+    color: colors.gold,
     fontSize: 28,
     fontWeight: "800",
     letterSpacing: 2,
@@ -833,39 +1094,39 @@ const styles = StyleSheet.create({
     fontSize: 11,
   },
   flagHint: {
-    marginTop: 12,
-    color: colors.muted,
-    fontSize: 13,
+    marginTop: 10,
+    color: "#A9BBDE",
+    fontSize: 12,
     textAlign: "center",
   },
   answers: {
     gap: 10,
   },
   answerOption: {
-    minHeight: 58,
+    minHeight: 57,
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 13,
+    paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: "#E7EDE7",
-    borderRadius: 17,
-    backgroundColor: colors.white,
+    borderColor: "rgba(94, 151, 235, 0.4)",
+    borderRadius: 16,
+    backgroundColor: "rgba(10, 31, 76, 0.94)",
   },
   answerOptionCorrect: {
-    borderColor: "#76B58F",
-    backgroundColor: colors.greenPale,
+    borderColor: colors.green,
+    backgroundColor: "rgba(10, 78, 57, 0.96)",
   },
   answerOptionWrong: {
-    borderColor: "#E5A294",
-    backgroundColor: "#FFF0EC",
+    borderColor: colors.red,
+    backgroundColor: "rgba(88, 34, 57, 0.94)",
   },
   optionLetter: {
     width: 30,
     height: 30,
     overflow: "hidden",
     borderRadius: 10,
-    color: colors.greenDark,
-    backgroundColor: colors.greenPale,
+    color: colors.gold,
+    backgroundColor: "rgba(69, 138, 241, 0.22)",
     fontSize: 12,
     fontWeight: "800",
     lineHeight: 30,
@@ -874,13 +1135,13 @@ const styles = StyleSheet.create({
   answerText: {
     flex: 1,
     marginLeft: 12,
-    color: colors.ink,
+    color: "#F2F6FF",
     fontSize: 15,
     fontWeight: "700",
   },
   answerMark: {
     marginHorizontal: 5,
-    color: colors.greenDark,
+    color: colors.green,
     fontSize: 20,
     fontWeight: "800",
   },
@@ -888,7 +1149,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   inputLabel: {
-    color: colors.muted,
+    color: "#AFC0E6",
     fontSize: 10,
     fontWeight: "800",
     letterSpacing: 1.2,
@@ -897,55 +1158,61 @@ const styles = StyleSheet.create({
     minHeight: 58,
     paddingHorizontal: 16,
     borderWidth: 1,
-    borderColor: "#E3E9E2",
+    borderColor: "rgba(93, 163, 243, 0.45)",
     borderRadius: 16,
     color: colors.ink,
-    backgroundColor: colors.white,
+    backgroundColor: "rgba(10, 29, 68, 0.96)",
     fontSize: 16,
   },
   primaryButton: {
+    position: "relative",
     minHeight: 54,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 9,
     paddingHorizontal: 18,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "rgba(255, 230, 131, 0.9)",
     borderRadius: 17,
-    backgroundColor: colors.green,
+    backgroundColor: colors.gold,
   },
   primaryButtonDisabled: {
     opacity: 0.45,
   },
   primaryButtonText: {
-    color: colors.white,
+    color: "#081638",
     fontSize: 15,
     fontWeight: "800",
   },
   primaryButtonArrow: {
-    color: colors.white,
+    color: "#081638",
     fontSize: 18,
     fontWeight: "700",
   },
   feedbackBox: {
+    minHeight: 66,
     flexDirection: "row",
     alignItems: "center",
     padding: 14,
     marginTop: 14,
+    borderWidth: 1,
     borderRadius: 16,
   },
   feedbackCorrect: {
-    backgroundColor: colors.greenPale,
+    borderColor: "rgba(53, 216, 139, 0.6)",
   },
   feedbackWrong: {
-    backgroundColor: "#FFF0EC",
+    borderColor: "rgba(255, 137, 148, 0.55)",
   },
   feedbackIcon: {
     width: 30,
     height: 30,
     marginRight: 11,
     borderRadius: 10,
-    color: colors.greenDark,
-    backgroundColor: colors.white,
+    color: colors.gold,
+    backgroundColor: "rgba(247, 249, 255, 0.1)",
     fontSize: 16,
     fontWeight: "800",
     lineHeight: 30,
@@ -961,31 +1228,35 @@ const styles = StyleSheet.create({
   },
   feedbackText: {
     marginTop: 3,
-    color: colors.muted,
+    color: "#BDCAE4",
     fontSize: 12,
     lineHeight: 17,
   },
   nextButton: {
     marginTop: 14,
-    backgroundColor: colors.greenDark,
   },
   resultCard: {
+    position: "relative",
     flexGrow: 1,
     alignItems: "center",
     justifyContent: "center",
+    overflow: "hidden",
     paddingHorizontal: 20,
     paddingVertical: 30,
     borderWidth: 1,
-    borderColor: "#E8EDE7",
-    borderRadius: 28,
-    backgroundColor: colors.white,
+    borderColor: "rgba(89, 169, 255, 0.43)",
+    borderRadius: 27,
+    backgroundColor: "#0A1941",
   },
   resultEmoji: {
     marginBottom: 12,
-    fontSize: 50,
+    fontSize: 62,
+    textShadowColor: "rgba(255, 196, 43, 0.5)",
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 18,
   },
   resultEyebrow: {
-    color: colors.green,
+    color: colors.gold,
     fontSize: 10,
     fontWeight: "800",
     letterSpacing: 1.5,
@@ -993,13 +1264,19 @@ const styles = StyleSheet.create({
   resultTitle: {
     marginTop: 9,
     color: colors.ink,
-    fontSize: 29,
+    fontSize: 30,
     fontWeight: "800",
     letterSpacing: -0.7,
   },
+  resultRank: {
+    marginTop: 5,
+    color: colors.blue,
+    fontSize: 14,
+    fontWeight: "700",
+  },
   resultSubtitle: {
     marginTop: 8,
-    color: colors.muted,
+    color: "#B4C3E1",
     fontSize: 13,
     textAlign: "center",
   },
@@ -1009,20 +1286,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginVertical: 24,
-    borderWidth: 9,
-    borderColor: colors.greenPale,
+    borderWidth: 7,
+    borderColor: colors.gold,
     borderRadius: 74,
-    backgroundColor: "#F9FCF9",
+    backgroundColor: "rgba(39, 72, 143, 0.55)",
+    shadowColor: colors.blue,
+    shadowOpacity: 0.5,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 8,
   },
   scoreValue: {
-    color: colors.greenDark,
+    color: colors.ink,
     fontSize: 47,
     fontWeight: "800",
     lineHeight: 52,
   },
   scoreTotal: {
     marginTop: 2,
-    color: colors.muted,
+    color: "#C0D0F1",
     fontSize: 9,
     fontWeight: "800",
     letterSpacing: 1.1,
@@ -1030,7 +1312,7 @@ const styles = StyleSheet.create({
   resultMessage: {
     maxWidth: 270,
     marginBottom: 22,
-    color: colors.muted,
+    color: "#B4C3E1",
     fontSize: 14,
     lineHeight: 21,
     textAlign: "center",
@@ -1040,8 +1322,53 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   secondaryButtonText: {
-    color: colors.greenDark,
+    color: "#D3DDF3",
     fontSize: 14,
     fontWeight: "700",
+  },
+  orbitGlow: {
+    position: "absolute",
+    width: 250,
+    height: 250,
+    borderWidth: 1,
+    borderColor: "rgba(70, 134, 255, 0.11)",
+    borderRadius: 125,
+  },
+  orbitGlowTop: {
+    top: -135,
+    right: -120,
+  },
+  orbitGlowBottom: {
+    bottom: -180,
+    left: -140,
+    width: 330,
+    height: 330,
+    borderRadius: 165,
+  },
+  backgroundStar: {
+    position: "absolute",
+    width: 3,
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: "#E5F2FF",
+    shadowColor: "#77C8FF",
+    shadowOpacity: 0.8,
+    shadowRadius: 5,
+  },
+  backgroundStarOne: {
+    top: "12%",
+    right: "13%",
+  },
+  backgroundStarTwo: {
+    top: "42%",
+    left: "7%",
+    width: 2,
+    height: 2,
+  },
+  backgroundStarThree: {
+    right: "9%",
+    bottom: "19%",
+    width: 2,
+    height: 2,
   },
 });
