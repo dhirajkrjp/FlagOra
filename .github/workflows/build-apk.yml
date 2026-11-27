@@ -6,9 +6,12 @@ on:
       - master
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
-    name: EAS Android APK Build
+    name: EAS Android APK Build & Release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -17,17 +20,30 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Setup Expo and EAS
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
+          packager: npm
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Trigger EAS APK Build
-        run: eas build --platform android --profile preview --non-interactive --no-wait
+      - name: Build APK on EAS and Download
+        run: |
+          BUILD_JSON=$(eas build --platform android --profile preview --non-interactive --wait --json)
+          APK_URL=$(echo "$BUILD_JSON" | jq -r '.[0].artifacts.buildUrl')
+          curl -L "$APK_URL" -o FlagOra-latest.apk
+
+      - name: Upload APK to GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: v1.0.0
+          name: FlagOra v1.0.0 – Android APK
+          files: FlagOra-latest.apk
+          overwrite_files: true
+          fail_on_unmatched_files: true
