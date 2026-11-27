@@ -1,5 +1,7 @@
 # FlagOra
 
+## Watch the Build (https://expo.dev/accounts/dhiraj7kr/projects/FlagOra/builds)[https://expo.dev/accounts/dhiraj7kr/projects/FlagOra/builds]
+
 FlagOra is a cross-platform flag quiz built with Expo and React Native. It presents a 10-question country challenge, loads flag and country data from a remote JSON source, and includes a browseable country directory with search.
 
 ## What the app does
