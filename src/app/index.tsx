@@ -19,6 +19,7 @@ import {
   fetchCountries,
   type Country,
 } from "../../data/countries";
+import { preloadFlagImages } from "../utils/flagImages";
 
 type Mode = "easy" | "hard";
 type Question = { answer: Country; choices: Country[] };
@@ -83,13 +84,21 @@ export default function Index() {
   const [isComplete, setIsComplete] = useState(false);
   const [failedFlagCode, setFailedFlagCode] = useState<string | null>(null);
   const [orbitRotation] = useState(() => new Animated.Value(0));
+  const [preparingMode, setPreparingMode] = useState<Mode | null>(null);
 
   useEffect(() => {
     let active = true;
 
     fetchCountries()
       .then((countries) => {
-        if (active) setCountryLoad({ status: "ready", countries });
+        if (active) {
+          const featuredFlagUrls = ORBITAL_FLAGS.flatMap(({ code }) => {
+            const country = countries.find((entry) => entry.code === code);
+            return country ? [country.flag] : [];
+          });
+          void preloadFlagImages(featuredFlagUrls);
+          setCountryLoad({ status: "ready", countries });
+        }
       })
       .catch((error: unknown) => {
         if (active) {
@@ -153,17 +162,28 @@ export default function Index() {
     { top: 36, left: 0 },
   ];
 
-  function startQuiz(nextMode: Mode) {
-    if (countryLoad.status !== "ready") return;
+  async function startQuiz(nextMode: Mode) {
+    if (countryLoad.status !== "ready" || preparingMode !== null) return;
 
-    setMode(nextMode);
-    setQuestions(createQuestions(countryLoad.countries));
-    setQuestionIndex(0);
-    setScore(0);
-    setGuess("");
-    setFeedback(null);
-    setIsComplete(false);
-    setFailedFlagCode(null);
+    const nextQuestions = createQuestions(countryLoad.countries);
+    setPreparingMode(nextMode);
+
+    try {
+      await preloadFlagImages([nextQuestions[0].answer.flag]);
+      void preloadFlagImages(
+        nextQuestions.slice(1).map((nextQuestion) => nextQuestion.answer.flag),
+      );
+      setQuestions(nextQuestions);
+      setMode(nextMode);
+      setQuestionIndex(0);
+      setScore(0);
+      setGuess("");
+      setFeedback(null);
+      setIsComplete(false);
+      setFailedFlagCode(null);
+    } finally {
+      setPreparingMode(null);
+    }
   }
 
   function changeMode() {
@@ -249,9 +269,11 @@ export default function Index() {
                       {flag.country ? (
                         <Image
                           accessibilityLabel={`Flag of ${flag.country.country}`}
+                          cachePolicy="memory-disk"
                           contentFit="contain"
                           source={{ uri: flag.country.flag }}
                           style={styles.flagChipImage}
+                          transition={150}
                         />
                       ) : (
                         <Text style={styles.flagChipText}>{flag.emoji}</Text>
@@ -306,7 +328,8 @@ export default function Index() {
             <>
               <Pressable
                 accessibilityRole="button"
-                onPress={() => startQuiz("easy")}
+                disabled={preparingMode !== null}
+                onPress={() => void startQuiz("easy")}
                 style={[styles.modeCard, styles.easyCard]}
               >
                 <LinearGradient
@@ -333,7 +356,8 @@ export default function Index() {
               </Pressable>
               <Pressable
                 accessibilityRole="button"
-                onPress={() => startQuiz("hard")}
+                disabled={preparingMode !== null}
+                onPress={() => void startQuiz("hard")}
                 style={[styles.modeCard, styles.hardCard]}
               >
                 <LinearGradient
@@ -358,6 +382,11 @@ export default function Index() {
                 </View>
                 <Text style={styles.chevron}>›</Text>
               </Pressable>
+              {preparingMode !== null && (
+                <Text style={styles.loadMessage}>
+                  Preparing your first flag...
+                </Text>
+              )}
             </>
           )}
           <View style={styles.homeFooter}>
@@ -408,7 +437,8 @@ export default function Index() {
             </Text>
             <Pressable
               accessibilityRole="button"
-              onPress={() => startQuiz(mode)}
+              disabled={preparingMode !== null}
+              onPress={() => void startQuiz(mode)}
               style={styles.primaryButton}
             >
               <LinearGradient
@@ -417,11 +447,14 @@ export default function Index() {
                 start={{ x: 0, y: 0 }}
                 style={StyleSheet.absoluteFill}
               />
-              <Text style={styles.primaryButtonText}>Play again</Text>
+              <Text style={styles.primaryButtonText}>
+                {preparingMode === null ? "Play again" : "Preparing flags..."}
+              </Text>
               <Text style={styles.primaryButtonArrow}>↗</Text>
             </Pressable>
             <Pressable
               accessibilityRole="button"
+              disabled={preparingMode !== null}
               onPress={changeMode}
               style={styles.secondaryButton}
             >
@@ -485,9 +518,10 @@ export default function Index() {
           ) : (
             <Image
               accessibilityLabel={`Flag of ${question.answer.country}`}
-              cachePolicy="disk"
+              cachePolicy="memory-disk"
               contentFit="contain"
               onError={() => setFailedFlagCode(question.answer.code)}
+              priority="high"
               source={{ uri: question.answer.flag }}
               style={styles.flagImage}
               transition={150}

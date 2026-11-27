@@ -12,6 +12,7 @@ import { Link } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { fetchCountries, type Country } from "../../data/countries";
+import { preloadFlagImages } from "../utils/flagImages";
 
 type CountryLoad =
   | { status: "loading" }
@@ -37,7 +38,16 @@ export default function Countries() {
 
     fetchCountries()
       .then((countries) => {
-        if (active) setCountryLoad({ status: "ready", countries });
+        if (active) {
+          setCountryLoad({ status: "ready", countries });
+          const initialFlags = [...countries]
+            .sort((first, second) =>
+              first.country.localeCompare(second.country),
+            )
+            .slice(0, 12)
+            .map((country) => country.flag);
+          void preloadFlagImages(initialFlags);
+        }
       })
       .catch((error: unknown) => {
         if (active) {
@@ -182,7 +192,7 @@ function CountryRow({ country }: { country: Country }) {
       <View style={styles.flagFrame}>
         <Image
           accessibilityLabel={`Flag of ${country.country}`}
-          cachePolicy="disk"
+          cachePolicy="memory-disk"
           contentFit="contain"
           source={{ uri: country.flag }}
           style={styles.flagImage}
