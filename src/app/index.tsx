@@ -1,6 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
+  Animated,
+  Easing,
   Keyboard,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -13,7 +16,6 @@ import { Image } from "expo-image";
 import { Link } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
-  COUNTRY_DATA_URL,
   fetchCountries,
   type Country,
 } from "../../data/countries";
@@ -23,6 +25,14 @@ type Question = { answer: Country; choices: Country[] };
 type Feedback = { isCorrect: boolean; answer: string } | null;
 
 const QUESTION_COUNT = 10;
+const ORBITAL_FLAGS = [
+  { code: "gb", emoji: "🇬🇧" },
+  { code: "jp", emoji: "🇯🇵" },
+  { code: "us", emoji: "🇺🇸" },
+  { code: "fr", emoji: "🇫🇷" },
+  { code: "br", emoji: "🇧🇷" },
+  { code: "in", emoji: "🇮🇳" },
+];
 
 function shuffle<T>(values: T[]): T[] {
   const shuffled = [...values];
@@ -72,6 +82,7 @@ export default function Index() {
   const [feedback, setFeedback] = useState<Feedback>(null);
   const [isComplete, setIsComplete] = useState(false);
   const [failedFlagCode, setFailedFlagCode] = useState<string | null>(null);
+  const [orbitRotation] = useState(() => new Animated.Value(0));
 
   useEffect(() => {
     let active = true;
@@ -96,6 +107,51 @@ export default function Index() {
       active = false;
     };
   }, [loadAttempt]);
+
+  useEffect(() => {
+    if (mode !== null) return;
+
+    const orbit = Animated.loop(
+      Animated.timing(orbitRotation, {
+        toValue: 1,
+        duration: 24000,
+        easing: Easing.linear,
+        useNativeDriver: Platform.OS !== "web",
+      }),
+    );
+    orbit.start();
+
+    return () => orbit.stop();
+  }, [mode, orbitRotation]);
+
+  const orbitalFlags = useMemo(
+    () =>
+      ORBITAL_FLAGS.map(({ code, emoji }) => ({
+        code,
+        emoji,
+        country:
+          countryLoad.status === "ready"
+            ? countryLoad.countries.find((entry) => entry.code === code)
+            : undefined,
+      })),
+    [countryLoad],
+  );
+  const orbitAngle = orbitRotation.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "360deg"],
+  });
+  const counterOrbitAngle = orbitRotation.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "-360deg"],
+  });
+  const orbitFlagPositions = [
+    { top: 0, left: "50%", marginLeft: -19 },
+    { top: 36, right: 0 },
+    { bottom: 36, right: 0 },
+    { bottom: 0, left: "50%", marginLeft: -19 },
+    { bottom: 36, left: 0 },
+    { top: 36, left: 0 },
+  ];
 
   function startQuiz(nextMode: Mode) {
     if (countryLoad.status !== "ready") return;
@@ -169,15 +225,42 @@ export default function Index() {
             </View>
             <View style={styles.globeStage}>
               <View style={styles.globeOrbit} />
+              <Animated.View
+                pointerEvents="none"
+                style={[
+                  styles.flagOrbit,
+                  { transform: [{ rotate: orbitAngle }] },
+                ]}
+              >
+                {orbitalFlags.map((flag, index) => (
+                  <View
+                    key={flag.code}
+                    style={[
+                      styles.orbitFlagSlot,
+                      orbitFlagPositions[index],
+                    ]}
+                  >
+                    <Animated.View
+                      style={[
+                        styles.flagChip,
+                        { transform: [{ rotate: counterOrbitAngle }] },
+                      ]}
+                    >
+                      {flag.country ? (
+                        <Image
+                          accessibilityLabel={`Flag of ${flag.country.country}`}
+                          contentFit="contain"
+                          source={{ uri: flag.country.flag }}
+                          style={styles.flagChipImage}
+                        />
+                      ) : (
+                        <Text style={styles.flagChipText}>{flag.emoji}</Text>
+                      )}
+                    </Animated.View>
+                  </View>
+                ))}
+              </Animated.View>
               <Text style={styles.heroGlobe}>🌍</Text>
-              <View style={[styles.flagChip, styles.flagChipOne]}>
-                <Text style={styles.flagChipText}>🇬🇧</Text>
-              </View>
-              <View style={[styles.flagChip, styles.flagChipTwo]}>
-                <Text style={styles.flagChipText}>🇯🇵</Text>
-              </View>
-              <Text style={[styles.heroSpark, styles.heroSparkOne]}>✦</Text>
-              <Text style={[styles.heroSpark, styles.heroSparkTwo]}>✧</Text>
             </View>
             <View style={styles.heroBottomline}>
               <View>
@@ -188,9 +271,15 @@ export default function Index() {
                     : "10 flags · One great adventure"}
                 </Text>
               </View>
-              <View style={styles.heroArrow}>
-                <Text style={styles.heroArrowText}>↗</Text>
-              </View>
+              <Link href="/countries" asChild>
+                <Pressable
+                  accessibilityLabel="Explore all countries"
+                  accessibilityRole="button"
+                  style={styles.heroArrow}
+                >
+                  <Text style={styles.heroArrowText}>↗</Text>
+                </Pressable>
+              </Link>
             </View>
           </View>
           <Text style={styles.sectionTitle}>Choose your level</Text>
@@ -274,23 +363,6 @@ export default function Index() {
           <View style={styles.homeFooter}>
             <Text style={styles.footerEmoji}>🌍</Text>
             <Text style={styles.footerText}>Know the world. Play the quiz.</Text>
-          </View>
-          <View style={styles.attribution}>
-            <Text style={styles.attributionText}>
-              Country data:{" "}
-              <Link href={COUNTRY_DATA_URL} style={styles.attributionLink}>
-                gedhiraj/Country
-              </Link>
-            </Text>
-            <Text style={styles.attributionText}>
-              Flag art by Twitter and contributors,{" "}
-              <Link
-                href="https://creativecommons.org/licenses/by/4.0/"
-                style={styles.attributionLink}
-              >
-                Twemoji CC BY 4.0
-              </Link>
-            </Text>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -539,7 +611,7 @@ function BrandHeader({ onChangeMode }: { onChangeMode?: () => void }) {
         >
           <Text style={styles.brandEmoji}>🌍</Text>
         </LinearGradient>
-        <Text style={styles.brandName}>Flagora</Text>
+        <Text style={styles.brandName}>FlagOra</Text>
       </View>
       {onChangeMode && (
         <Pressable
@@ -595,7 +667,10 @@ function AnswerFeedback({
 
 function GameBackdrop() {
   return (
-    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+    <View
+      pointerEvents="none"
+      style={[StyleSheet.absoluteFill, styles.backdropClip]}
+    >
       <LinearGradient
         colors={["#03091F", "#07163D", "#06102E"]}
         end={{ x: 1, y: 1 }}
@@ -632,6 +707,9 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  backdropClip: {
+    overflow: "hidden",
   },
   homeContent: {
     flexGrow: 1,
@@ -760,18 +838,35 @@ const styles = StyleSheet.create({
     transform: [{ rotate: "-12deg" }],
   },
   globeStage: {
-    height: 128,
+    height: 184,
     alignItems: "center",
     justifyContent: "center",
   },
   globeOrbit: {
     position: "absolute",
-    width: 170,
-    height: 58,
+    width: 148,
+    height: 148,
+    left: "50%",
+    top: "50%",
+    marginLeft: -74,
+    marginTop: -74,
     borderWidth: 1,
     borderColor: "rgba(85, 198, 255, 0.82)",
-    borderRadius: 90,
-    transform: [{ rotate: "-18deg" }],
+    borderRadius: 74,
+  },
+  flagOrbit: {
+    position: "absolute",
+    width: 184,
+    height: 184,
+    left: "50%",
+    top: "50%",
+    marginLeft: -92,
+    marginTop: -92,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  orbitFlagSlot: {
+    position: "absolute",
   },
   heroGlobe: {
     fontSize: 82,
@@ -781,40 +876,27 @@ const styles = StyleSheet.create({
     textShadowRadius: 18,
   },
   flagChip: {
-    position: "absolute",
-    width: 34,
-    height: 34,
+    width: 38,
+    height: 36,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
     borderColor: "rgba(135, 192, 255, 0.65)",
     borderRadius: 12,
     backgroundColor: "#102A62",
-  },
-  flagChipOne: {
-    left: "18%",
-    top: 16,
-  },
-  flagChipTwo: {
-    right: "17%",
-    bottom: 13,
+    shadowColor: "#53B9FF",
+    shadowOpacity: 0.22,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
   },
   flagChipText: {
-    fontSize: 19,
+    fontSize: 18,
   },
-  heroSpark: {
-    position: "absolute",
-    color: colors.gold,
-    fontSize: 16,
-  },
-  heroSparkOne: {
-    left: "27%",
-    bottom: 15,
-  },
-  heroSparkTwo: {
-    right: "27%",
-    top: 12,
-    color: colors.blue,
+  flagChipImage: {
+    width: 25,
+    height: 18,
+    borderRadius: 2,
   },
   heroBottomline: {
     flexDirection: "row",
@@ -840,6 +922,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 13,
     backgroundColor: colors.gold,
+    elevation: 4,
+    shadowColor: colors.gold,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.28,
+    shadowRadius: 8,
   },
   heroArrowText: {
     color: "#071337",
@@ -984,20 +1071,6 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 13,
     fontWeight: "700",
-  },
-  attribution: {
-    alignItems: "center",
-    gap: 4,
-    paddingTop: 17,
-  },
-  attributionText: {
-    color: "#7185AF",
-    fontSize: 10,
-    textAlign: "center",
-  },
-  attributionLink: {
-    color: colors.gold,
-    textDecorationLine: "underline",
   },
   progressHeader: {
     flexDirection: "row",
